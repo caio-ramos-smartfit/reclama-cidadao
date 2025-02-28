@@ -7,6 +7,11 @@ class CommentsController < ApplicationController
     @comment.user = current_user
 
     if @comment.save
+      # Enviar notificação por email se o comentário for de um administrador
+      if current_user.admin? && current_user != @complaint.user
+        NotificationMailer.comment_notification(@comment).deliver_later
+      end
+      
       redirect_to @complaint, notice: 'Comentário adicionado com sucesso.'
     else
       redirect_to @complaint, alert: 'Erro ao adicionar comentário.'

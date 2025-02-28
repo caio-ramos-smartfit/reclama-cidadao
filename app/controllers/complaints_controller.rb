@@ -22,6 +22,7 @@ class ComplaintsController < ApplicationController
 
   def create
     @complaint = current_user.complaints.new(complaint_params)
+    @complaint.status = 'open' # Status inicial: Aberta
 
     if @complaint.save
       redirect_to @complaint, notice: 'Reclamação registrada com sucesso.'
@@ -34,7 +35,14 @@ class ComplaintsController < ApplicationController
   end
 
   def update
+    old_status = @complaint.status
+    
     if @complaint.update(complaint_params)
+      # Enviar email de notificação se o status foi alterado
+      if old_status != @complaint.status
+        NotificationMailer.status_update(@complaint).deliver_later
+      end
+      
       redirect_to @complaint, notice: 'Reclamação atualizada com sucesso.'
     else
       render :edit, status: :unprocessable_entity
@@ -59,6 +67,10 @@ class ComplaintsController < ApplicationController
   end
 
   def complaint_params
-    params.require(:complaint).permit(:title, :description, :category, :address, :latitude, :longitude)
+    if current_user.admin?
+      params.require(:complaint).permit(:title, :description, :category, :status, :address, :latitude, :longitude)
+    else
+      params.require(:complaint).permit(:title, :description, :category, :address, :latitude, :longitude)
+    end
   end
 end

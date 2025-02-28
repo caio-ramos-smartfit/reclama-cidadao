@@ -310,4 +310,13 @@ Devise.setup do |config|
   # When set to false, does not sign a user in automatically after their password is
   # changed. Defaults to true, so a user is signed in automatically after changing a password.
   # config.sign_in_after_change_password = true
+# ==> Security Extension  # Configure the maximum number of failed attempts to sign in.  # After this limit is reached, the user will be locked.  config.lock_strategy = :failed_attempts  config.maximum_attempts = 5  config.unlock_strategy = :time  config.unlock_in = 1.hour
 end
+
+  # ==> Security Extension
+  # Configure the maximum number of failed attempts to sign in.
+  # After this limit is reached, the user will be locked.
+  config.lock_strategy = :failed_attempts
+  config.maximum_attempts = 5
+  config.unlock_strategy = :time
+  config.unlock_in = 1.hour
