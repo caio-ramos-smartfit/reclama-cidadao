@@ -1,0 +1,108 @@
+<div class='row mb-4'>
+  <div class='col-md-12'>
+    <h1>Editar Reclamação</h1>
+  </div>
+</div>
+
+<div class='row'>
+  <div class='col-md-8'>
+    <%= simple_form_for @complaint do |f| %>
+      <div class='card'>
+        <div class='card-body'>
+          <%= f.error_notification %>
+
+          <div class='form-inputs'>
+            <%= f.input :title, label: 'Título', input_html: { class: 'form-control' } %>
+            <%= f.input :description, label: 'Descrição', input_html: { class: 'form-control', rows: 5 } %>
+            <%= f.input :category, label: 'Categoria', 
+                        collection: Complaint.categories.map { |k, v| [v, k] },
+                        input_html: { class: 'form-select' } %>
+            
+            <% if current_user.admin? %>
+              <%= f.input :status, label: 'Status', 
+                          collection: Complaint.statuses.map { |k, v| [v, k] },
+                          input_html: { class: 'form-select' } %>
+            <% end %>
+            
+            <%= f.input :address, label: 'Endereço', input_html: { class: 'form-control', id: 'address-input' } %>
+            <%= f.input :latitude, as: :hidden, input_html: { id: 'latitude-input' } %>
+            <%= f.input :longitude, as: :hidden, input_html: { id: 'longitude-input' } %>
+          </div>
+
+          <div class='mb-3'>
+            <label class='form-label'>Localização no Mapa</label>
+            <div id='map' style='height: 300px;' data-latitude='<%= @complaint.latitude %>' data-longitude='<%= @complaint.longitude %>'></div>
+            <small class='form-text text-muted'>Arraste o marcador para ajustar a localização exata.</small>
+          </div>
+
+          <div class='form-actions'>
+            <%= f.button :submit, 'Atualizar Reclamação', class: 'btn btn-primary' %>
+            <%= link_to 'Cancelar', @complaint, class: 'btn btn-outline-secondary' %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const mapElement = document.getElementById('map');
+    const lat = parseFloat(mapElement.dataset.latitude) || -23.5505;
+    const lng = parseFloat(mapElement.dataset.longitude) || -46.6333;
+    
+    let map = L.map('map').setView([lat, lng], 15);
+    let marker;
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href=https://www.openstreetmap.org/copyright>OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Adicionar marcador inicial
+    marker = L.marker([lat, lng], {
+      draggable: true
+    }).addTo(map);
+
+    // Atualizar coordenadas quando o marcador for movido
+    marker.on('dragend', function(e) {
+      updateCoordinates(marker.getLatLng());
+    });
+
+    // Função para atualizar os campos de latitude e longitude
+    function updateCoordinates(latlng) {
+      document.getElementById('latitude-input').value = latlng.lat;
+      document.getElementById('longitude-input').value = latlng.lng;
+      
+      // Buscar endereço a partir das coordenadas (geocodificação reversa)
+      fetch()
+        .then(response => response.json())
+        .then(data => {
+          if (data.display_name) {
+            document.getElementById('address-input').value = data.display_name;
+          }
+        })
+        .catch(error => console.error('Erro ao buscar endereço:', error));
+    }
+
+    // Buscar coordenadas a partir do endereço digitado
+    const addressInput = document.getElementById('address-input');
+    addressInput.addEventListener('blur', function() {
+      const address = this.value;
+      if (address) {
+        fetch()
+          .then(response => response.json())
+          .then(data => {
+            if (data.length > 0) {
+              const lat = parseFloat(data[0].lat);
+              const lon = parseFloat(data[0].lon);
+              
+              marker.setLatLng([lat, lon]);
+              map.setView([lat, lon], 15);
+              updateCoordinates({lat: lat, lng: lon});
+            }
+          })
+          .catch(error => console.error('Erro ao buscar coordenadas:', error));
+      }
+    });
+  });
+</script>

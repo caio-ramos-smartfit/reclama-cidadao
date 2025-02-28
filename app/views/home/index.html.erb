@@ -1,0 +1,20 @@
+<div class='jumbotron'>
+  <h1>Sistema de Reclamações Urbanas</h1>
+  <p>Registre e acompanhe reclamações sobre problemas urbanos na sua cidade.</p>
+  <% if user_signed_in? %>
+    <p><%= link_to 'Registrar Nova Reclamação', new_complaint_path, class: 'btn btn-primary btn-lg' %></p>
+  <% else %>
+    <p>
+      <%= link_to 'Entrar', new_user_session_path, class: 'btn btn-primary btn-lg' %>
+      <%= link_to 'Cadastrar', new_user_registration_path, class: 'btn btn-success btn-lg' %>
+    </p>
+  <% end %>
+</div>
+
+<div class='row'>
+  <div class='col-md-12'>
+    <h2>Reclamações Recentes</h2>
+    <p>Veja as reclamações mais recentes registradas pelos cidadãos.</p>
+    <p><%= link_to 'Ver Todas as Reclamações', complaints_path, class: 'btn btn-info' %></p>
+  </div>
+</div>

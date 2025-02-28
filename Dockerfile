@@ -4,7 +4,7 @@ FROM ruby:3.2.2
 RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
 
 # Configurar diretório de trabalho
-WORKDIR /app
+WORKDIR /rails
 
 # Instalar gems
 COPY Gemfile Gemfile.lock ./
