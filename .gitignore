@@ -1,0 +1,42 @@
+# Ignorar arquivos específicos do Rails
+/.bundle
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+/storage/*
+!/storage/.keep
+/tmp/storage/*
+!/tmp/storage/.keep
+
+# Ignorar arquivos de ambiente
+/.env
+/.env.*
+!/.env.example
+
+# Ignorar arquivos de banco de dados
+/db/*.sqlite3
+/db/*.sqlite3-*
+
+# Ignorar arquivos de configuração específicos
+/config/master.key
+/config/credentials/*.key
+
+# Ignorar arquivos de dependências
+/node_modules
+/yarn-error.log
+yarn-debug.log*
+.yarn-integrity
+
+# Ignorar arquivos de cobertura de testes
+/coverage/
+
+# Ignorar arquivos temporários
+.DS_Store
+.idea
+.vscode
+*.swp
+*~
+
+# Ignorar arquivos de upload (para desenvolvimento)
+/public/uploads
