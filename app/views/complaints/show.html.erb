@@ -94,23 +94,45 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const mapElement = document.getElementById('map');
-    if (mapElement) {
-      const lat = parseFloat(mapElement.dataset.latitude);
-      const lng = parseFloat(mapElement.dataset.longitude);
-      
-      if (lat && lng) {
-        const map = L.map('map').setView([lat, lng], 15);
-        
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href=https://www.openstreetmap.org/copyright>OpenStreetMap</a> contributors'
-        }).addTo(map);
-        
-        L.marker([lat, lng]).addTo(map)
-          .bindPopup('<%= @complaint.title %>')
-          .openPopup();
-      }
+  const cleanupShowMap = () => {
+    if (window.showMap) {
+      window.showMap.remove();
+      window.showMap = null;
     }
-  });
+  };
+
+  const initializeShowMap = () => {
+    cleanupShowMap();
+    
+    const mapElement = document.getElementById('map');
+    if (!mapElement || typeof L === 'undefined') return;
+
+    const lat = parseFloat(mapElement.dataset.latitude);
+    const lng = parseFloat(mapElement.dataset.longitude);
+    
+    if (lat && lng) {
+      window.showMap = L.map('map').setView([lat, lng], 15);
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(window.showMap);
+      
+      L.marker([lat, lng]).addTo(window.showMap)
+        .bindPopup('<%= @complaint.title %>')
+        .openPopup();
+        
+      window.showMap.invalidateSize();
+    }
+  };
+
+  // Remover eventos anteriores e adicionar novos
+  document.removeEventListener('turbo:render', initializeShowMap);
+  document.removeEventListener('turbo:load', initializeShowMap);
+  
+  // Adicionar eventos do Turbo
+  document.addEventListener('turbo:render', initializeShowMap);
+  document.addEventListener('turbo:load', initializeShowMap);
+  
+  // Limpar mapa quando a página for desmontada
+  document.addEventListener('turbo:before-render', cleanupShowMap);
 </script>
