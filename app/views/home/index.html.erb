@@ -1,6 +1,10 @@
+
+
 <div class='jumbotron'>
   <h1>Sistema de Reclamações Urbanas</h1>
   <p>Registre e acompanhe reclamações sobre problemas urbanos na sua cidade.</p>
+  <br>
+  <%= render 'home_map' %>
   <% if user_signed_in? %>
     <p><%= link_to 'Registrar Nova Reclamação', new_complaint_path, class: 'btn btn-primary btn-lg' %></p>
   <% else %>
