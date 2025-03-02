@@ -26,7 +26,7 @@
         <hr>
         <h5 class='card-title'>Localização</h5>
         <p class='card-text'><%= @complaint.address %></p>
-        <div id='map' style='height: 300px;' data-latitude='<%= @complaint.latitude %>' data-longitude='<%= @complaint.longitude %>'></div>
+        <div id='map' style='height: 300px; border: 1px solid #ccc; margin-bottom: 10px;' data-latitude='<%= @complaint.latitude %>' data-longitude='<%= @complaint.longitude %>' data-title='<%= @complaint.title %>'></div>
       </div>
       <div class='card-footer text-muted'>
         <div class='d-flex justify-content-between'>
@@ -93,24 +93,5 @@
   </div>
 </div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const mapElement = document.getElementById('map');
-    if (mapElement) {
-      const lat = parseFloat(mapElement.dataset.latitude);
-      const lng = parseFloat(mapElement.dataset.longitude);
-      
-      if (lat && lng) {
-        const map = L.map('map').setView([lat, lng], 15);
-        
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href=https://www.openstreetmap.org/copyright>OpenStreetMap</a> contributors'
-        }).addTo(map);
-        
-        L.marker([lat, lng]).addTo(map)
-          .bindPopup('<%= @complaint.title %>')
-          .openPopup();
-      }
-    }
-  });
-</script>
+<!-- Incluir o partial de inicialização do mapa para a página de visualização -->
+<%= render 'map_show' %>
