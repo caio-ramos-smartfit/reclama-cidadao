@@ -26,7 +26,10 @@
         <hr>
         <h5 class='card-title'>Localização</h5>
         <p class='card-text'><%= @complaint.address %></p>
-        <div id='map' style='height: 300px; border: 1px solid #ccc; margin-bottom: 10px;' data-latitude='<%= @complaint.latitude %>' data-longitude='<%= @complaint.longitude %>' data-title='<%= @complaint.title %>'></div>
+
+        <%= render partial: 'complaints/map', locals: { 
+          editable: false 
+        } %>
       </div>
       <div class='card-footer text-muted'>
         <div class='d-flex justify-content-between'>
@@ -92,6 +95,3 @@
     </div>
   </div>
 </div>
-
-<!-- Incluir o partial de inicialização do mapa para a página de visualização -->
-<%= render 'map' %>

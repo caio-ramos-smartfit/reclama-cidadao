@@ -1,6 +1,5 @@
 import "@hotwired/turbo-rails"
 import "controllers"
-import "map_manager"
 
 document.addEventListener('turbo:before-frame-render', () => {
     console.log("load aqui")
