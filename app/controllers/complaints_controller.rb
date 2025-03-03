@@ -7,6 +7,7 @@ class ComplaintsController < ApplicationController
     @complaints = Complaint.all
     @complaints = @complaints.by_status(params[:status]) if params[:status].present?
     @complaints = @complaints.by_category(params[:category]) if params[:category].present?
+    @complaints = @complaints.by_anonymous(params[:anonymous]) if params[:anonymous].present?
     @complaints = @complaints.where(user_id: params[:user_id]) if params[:user_id].present?
     @complaints = @complaints.page(params[:page]).per(10)
   end

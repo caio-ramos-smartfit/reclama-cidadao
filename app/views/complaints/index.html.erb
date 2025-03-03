@@ -24,7 +24,13 @@
                     { include_blank: 'Todos os Status' },
                     class: 'form-select' %>
       </div>
-      <div class='col-md-4'>
+      <div class='col-md-2'>
+        <%= f.select :anonymous,
+                    options_for_select([['Anônimas', 'true'], ['Não anônimas', 'false']], params[:anonymous]),
+                    { include_blank: 'Todas (anônimas ou não)' },
+                    class: 'form-select' %>
+      </div>
+      <div class='col-md-3'>
         <%= f.text_field :address, placeholder: 'Endereço', class: 'form-control' %>
       </div>
       <div class='col-md-2'>

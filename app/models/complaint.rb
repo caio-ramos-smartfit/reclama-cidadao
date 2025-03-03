@@ -38,6 +38,9 @@ class Complaint < ApplicationRecord
     where('created_at >= ? AND created_at <= ?', start_date, end_date) if start_date.present? && end_date.present?
   }
   
+  # Escopo para filtrar reclamações por status anônimo
+  scope :by_anonymous, ->(anonymous) { where(anonymous: anonymous) if anonymous.present? }
+  
   # Método para exibir o nome do usuário respeitando o anonimato
   def user_display_name
     anonymous? ? "Anônimo" : user.name
