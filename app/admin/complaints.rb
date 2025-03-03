@@ -1,10 +1,11 @@
 ActiveAdmin.register Complaint do
-  permit_params :title, :description, :category, :status, :address, :latitude, :longitude, :user_id
+  permit_params :title, :description, :category, :status, :address, :latitude, :longitude, :user_id, :anonymous
 
   filter :title
   filter :category
   filter :status
   filter :address
+  filter :anonymous
   filter :created_at
 
   index do
@@ -14,7 +15,15 @@ ActiveAdmin.register Complaint do
     column :category
     column :status
     column :address
-    column :user
+    column :user do |complaint|
+      if complaint.anonymous?
+        span complaint.user.name
+        status_tag "Anônimo", class: "warning"
+      else
+        span complaint.user.name
+      end
+    end
+    column :anonymous
     column :created_at
     actions
   end
@@ -29,7 +38,15 @@ ActiveAdmin.register Complaint do
       row :address
       row :latitude
       row :longitude
-      row :user
+      row :user do |complaint|
+        if complaint.anonymous?
+          span complaint.user.name
+          status_tag "Anônimo", class: "warning"
+        else
+          span complaint.user.name
+        end
+      end
+      row :anonymous
       row :created_at
       row :updated_at
     end
@@ -54,6 +71,7 @@ ActiveAdmin.register Complaint do
       f.input :latitude
       f.input :longitude
       f.input :user
+      f.input :anonymous
     end
     f.actions
   end

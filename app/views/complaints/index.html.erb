@@ -56,7 +56,12 @@
           </div>
           <div class='card-footer text-muted'>
             <div class='d-flex justify-content-between'>
-              <span>Por: <%= complaint.user.name %></span>
+              <span>
+                Por: <%= complaint.user_display_name %>
+                <% if complaint.anonymous? %>
+                  <i class="bi bi-incognito" title="Denúncia anônima"></i>
+                <% end %>
+              </span>
               <span><%= time_ago_in_words(complaint.created_at) %> atrás</span>
             </div>
           </div>

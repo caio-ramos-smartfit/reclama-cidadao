@@ -37,4 +37,9 @@ class Complaint < ApplicationRecord
   scope :by_period, ->(start_date, end_date) {
     where('created_at >= ? AND created_at <= ?', start_date, end_date) if start_date.present? && end_date.present?
   }
+  
+  # Método para exibir o nome do usuário respeitando o anonimato
+  def user_display_name
+    anonymous? ? "Anônimo" : user.name
+  end
 end

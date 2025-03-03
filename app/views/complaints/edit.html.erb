@@ -27,6 +27,14 @@
             <%= f.input :address, label: 'Endereço', input_html: { class: 'form-control', id: 'address-input' } %>
             <%= f.input :latitude, as: :hidden, input_html: { id: 'complaint_latitude' } %>
             <%= f.input :longitude, as: :hidden, input_html: { id: 'complaint_longitude' } %>
+            
+            <div class="form-check mb-3">
+              <%= f.input :anonymous, as: :boolean, 
+                         label: 'Denúncia anônima (sua identidade será protegida)',
+                         hint: 'Recomendado para denúncias sensíveis como pontos de drogas ou maus-tratos a animais',
+                         wrapper: :custom_boolean,
+                         input_html: { class: 'form-check-input' } %>
+            </div>
           </div>
 
           <div class='mb-3'>

@@ -68,9 +68,9 @@ class ComplaintsController < ApplicationController
 
   def complaint_params
     if current_user.admin?
-      params.require(:complaint).permit(:title, :description, :category, :status, :address, :latitude, :longitude)
+      params.require(:complaint).permit(:title, :description, :category, :status, :address, :latitude, :longitude, :anonymous)
     else
-      params.require(:complaint).permit(:title, :description, :category, :address, :latitude, :longitude)
+      params.require(:complaint).permit(:title, :description, :category, :address, :latitude, :longitude, :anonymous)
     end
   end
 end

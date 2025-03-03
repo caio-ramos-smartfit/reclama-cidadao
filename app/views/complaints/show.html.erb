@@ -30,7 +30,7 @@
       </div>
       <div class='card-footer text-muted'>
         <div class='d-flex justify-content-between'>
-          <span>Registrado por: <%= @complaint.user.name %></span>
+          <span>Registrado por: <%= @complaint.user_display_name %></span>
           <span>Em: <%= @complaint.created_at.strftime('%d/%m/%Y %H:%M') %></span>
         </div>
       </div>
