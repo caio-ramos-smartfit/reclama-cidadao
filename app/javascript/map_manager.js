@@ -238,6 +238,13 @@ const MapManager = {
       } else {
         console.log("[MapManager] Mapa da home já inicializado, atualizando...");
         window.homeMap.invalidateSize();
+        
+        // Forçar a atualização dos dados ao retornar à home
+        if (window.location.pathname === '/' || window.location.pathname === '') {
+          console.log("[MapManager] Detectada navegação para a home, forçando atualização dos dados...");
+          this.forceHomeDataRefresh();
+        }
+        
         const mapInitializedEvent = new CustomEvent('homeMapInitialized');
         document.dispatchEvent(mapInitializedEvent);
       }
@@ -254,6 +261,64 @@ const MapManager = {
         window.complaintMap.invalidateSize();
       }
     }
+  },
+  
+  // Forçar a atualização dos dados da home
+  forceHomeDataRefresh: function() {
+    console.log("[MapManager] Forçando atualização dos dados da home...");
+    
+    // Verificar se estamos na página inicial
+    if (window.location.pathname !== '/' && window.location.pathname !== '') {
+      console.log("[MapManager] Não estamos na página inicial, ignorando atualização de dados.");
+      return;
+    }
+    
+    // Verificar se o mapa da home está inicializado
+    if (!window.homeMap) {
+      console.log("[MapManager] Mapa da home não inicializado, inicializando primeiro...");
+      this.initializeHomeMap();
+    }
+    
+    console.log("[MapManager] Buscando dados atualizados via AJAX...");
+    
+    // Buscar dados atualizados via fetch
+    fetch('/?format=json', {
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      cache: 'no-store' // Importante: não usar cache para sempre obter dados atualizados
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Erro ao buscar dados atualizados');
+      }
+      console.log("[MapManager] Resposta recebida, convertendo para JSON...");
+      return response.json();
+    })
+    .then(data => {
+      console.log("[MapManager] Dados atualizados recebidos:", data);
+      
+      if (data && data.complaints) {
+        console.log("[MapManager] Total de reclamações recebidas:", data.complaints.length);
+        
+        // Disparar evento com os dados atualizados
+        const dataRefreshEvent = new CustomEvent('homeDataRefreshed', { 
+          detail: { 
+            complaints: data.complaints,
+            timestamp: new Date().getTime()
+          } 
+        });
+        
+        console.log("[MapManager] Disparando evento homeDataRefreshed...");
+        document.dispatchEvent(dataRefreshEvent);
+      } else {
+        console.error("[MapManager] Dados recebidos não contêm reclamações:", data);
+      }
+    })
+    .catch(error => {
+      console.error("[MapManager] Erro ao atualizar dados:", error);
+    });
   }
 };
 
