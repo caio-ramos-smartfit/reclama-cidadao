@@ -1,90 +1,104 @@
 <div id="home-map" style="width: 100%; height: 400px; border: 1px solid #ccc; margin-bottom: 20px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);"></div>
 
 <script>
-  // Coordenadas de Caconde
-  const CACONDE_LAT = -21.5288;
-  const CACONDE_LNG = -46.6438;
+  // Variável para controlar se os marcadores já foram adicionados
+  let markersAdded = false;
   
-  // Função para inicializar o mapa da home
-  function initializeHomeMap() {
-    console.log("Inicializando mapa da home...");
+  // Função para adicionar marcadores ao mapa
+  function addMarkersToHomeMap() {
+    console.log("[HomeMap] Adicionando marcadores ao mapa...");
     
-    // Verificar se o Leaflet está disponível
-    if (typeof L === 'undefined') {
-      console.error("Leaflet não está disponível!");
+    if (!window.homeMap) {
+      console.error("[HomeMap] Mapa não inicializado!");
       return;
     }
     
-    // Verificar se o elemento do mapa existe
-    const mapElement = document.getElementById('home-map');
-    if (!mapElement) {
-      console.error("Elemento do mapa não encontrado!");
+    // Verificar se os marcadores já foram adicionados
+    if (markersAdded) {
+      console.log("[HomeMap] Marcadores já adicionados, ignorando...");
       return;
     }
     
-    try {
-      console.log("Criando mapa com coordenadas de Caconde:", CACONDE_LAT, CACONDE_LNG);
-      
-      // Inicializar o mapa com as coordenadas de Caconde
-      window.homeMap = L.map('home-map').setView([CACONDE_LAT, CACONDE_LNG], 13);
-      
-      // Adicionar camada de tiles
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(window.homeMap);
-      
-      // Adicionar marcadores para cada reclamação
-      <% if @complaints.present? %>
-        <% @complaints.each do |complaint| %>
-          <% if complaint.latitude.present? && complaint.longitude.present? %>
-            // Criar marcador
-            const marker<%= complaint.id %> = L.marker([<%= complaint.latitude %>, <%= complaint.longitude %>]).addTo(window.homeMap);
-            
-            // Adicionar popup com informações da reclamação
-            marker<%= complaint.id %>.bindPopup(`
-              <div class="popup-content">
-                <strong><%= complaint.title %></strong><br>
-                <em>Categoria: <%= Complaint.categories[complaint.category] %></em><br>
-                <em>Status: <%= Complaint.statuses[complaint.status] %></em><br>
-                <p><%= truncate(complaint.description, length: 150) %></p>
-                <a href="/complaints/<%= complaint.id %>" class="btn btn-sm btn-info">Ver detalhes</a>
-              </div>
-            `);
-          <% end %>
+    // Limpar marcadores existentes
+    if (window.homeMapMarkers && window.homeMapMarkers.length > 0) {
+      console.log("[HomeMap] Limpando marcadores existentes...");
+      window.homeMapMarkers.forEach(marker => {
+        window.homeMap.removeLayer(marker);
+      });
+    }
+    
+    // Inicializar array de marcadores
+    window.homeMapMarkers = [];
+    
+    console.log("[HomeMap] Verificando reclamações para adicionar marcadores...");
+    
+    <% if @complaints.present? %>
+      <% @complaints.each do |complaint| %>
+        <% if complaint.latitude.present? && complaint.longitude.present? %>
+          // Criar marcador
+          const marker<%= complaint.id %> = L.marker([<%= complaint.latitude %>, <%= complaint.longitude %>]).addTo(window.homeMap);
+          window.homeMapMarkers.push(marker<%= complaint.id %>);
+          
+          // Adicionar popup com informações da reclamação
+          marker<%= complaint.id %>.bindPopup(`
+            <div class="popup-content">
+              <strong><%= complaint.title %></strong><br>
+              <em>Categoria: <%= complaint.category_before_type_cast.is_a?(String) ? complaint.category : Complaint.categories[complaint.category] %></em><br>
+              <em>Status: <%= complaint.status_before_type_cast.is_a?(String) ? complaint.status : Complaint.statuses[complaint.status] %></em><br>
+              <p><%= truncate(complaint.description, length: 150) %></p>
+              <a href="/complaints/<%= complaint.id %>" class="btn btn-sm btn-info">Ver detalhes</a>
+            </div>
+          `);
+          
+          console.log("[HomeMap] Marcador adicionado para reclamação #<%= complaint.id %> em [<%= complaint.latitude %>, <%= complaint.longitude %>]");
+          
+          // Disparar um evento personalizado para depuração (sem declarar variável)
+          document.dispatchEvent(new CustomEvent('markerAdded', { detail: { id: <%= complaint.id %> } }));
         <% end %>
-      <% else %>
-        console.log("Nenhuma reclamação encontrada com coordenadas válidas.");
       <% end %>
       
-      // Forçar a renderização do mapa
-      setTimeout(() => {
-        window.homeMap.invalidateSize();
-        console.log("Mapa da home inicializado com sucesso!");
-      }, 100);
-    } catch (error) {
-      console.error("Erro ao inicializar o mapa da home:", error);
-    }
+      // Marcar que os marcadores foram adicionados
+      markersAdded = true;
+      console.log("[HomeMap] Total de marcadores adicionados: <%= @complaints.where.not(latitude: nil, longitude: nil).count %>");
+    <% else %>
+      console.log("[HomeMap] Nenhuma reclamação encontrada com coordenadas válidas.");
+    <% end %>
   }
   
-  // Inicializar o mapa quando o documento estiver pronto
+  // Adicionar marcadores quando o mapa for inicializado
+  document.addEventListener('homeMapInitialized', function() {
+    console.log("[HomeMap] Evento homeMapInitialized recebido, adicionando marcadores...");
+    addMarkersToHomeMap();
+  });
+  
+  // Também tentar adicionar marcadores nos eventos padrão (fallback)
   document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOMContentLoaded - Inicializando mapa da home...");
-    setTimeout(initializeHomeMap, 100);
+    console.log("[HomeMap] DOMContentLoaded - Verificando se o mapa está pronto...");
+    setTimeout(function() {
+      if (window.homeMap) {
+        addMarkersToHomeMap();
+      }
+    }, 500);
   });
   
-  // Inicializar o mapa quando a página for carregada via Turbo
+  // Também tentar adicionar marcadores quando a página for carregada via Turbo
   document.addEventListener('turbo:load', function() {
-    console.log("turbo:load - Inicializando mapa da home...");
-    setTimeout(initializeHomeMap, 100);
+    console.log("[HomeMap] turbo:load - Verificando se o mapa está pronto...");
+    setTimeout(function() {
+      if (window.homeMap) {
+        addMarkersToHomeMap();
+      }
+    }, 500);
   });
   
-  // Inicializar o mapa quando a página for renderizada via Turbo
-  document.addEventListener('turbo:render', function() {
-    console.log("turbo:render - Inicializando mapa da home...");
-    setTimeout(initializeHomeMap, 100);
+  // Adicionar um listener para o evento de reinicialização do mapa
+  document.addEventListener('homeMapReset', function() {
+    console.log("[HomeMap] Evento homeMapReset recebido, redefinindo estado dos marcadores...");
+    markersAdded = false;
   });
   
-  // Inicializar o mapa imediatamente
-  console.log("Executando inicialização imediata do mapa da home...");
-  setTimeout(initializeHomeMap, 100);
+  // Adicionar um listener para o evento de depuração
+  document.addEventListener('markerAdded', function(event) {
+    console.log("[HomeMap] Evento markerAdded recebido para reclamação #" + event.detail.id);
+  });
 </script>

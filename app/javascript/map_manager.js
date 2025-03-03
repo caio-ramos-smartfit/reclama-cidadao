@@ -40,6 +40,10 @@ const MapManager = {
       // Limpar mapa anterior se existir
       this.cleanupHomeMap();
       
+      // Notificar que o mapa foi redefinido
+      const mapResetEvent = new CustomEvent('homeMapReset');
+      document.dispatchEvent(mapResetEvent);
+      
       console.log("[MapManager] Criando mapa da home com coordenadas de Caconde:", CACONDE_LAT, CACONDE_LNG);
       
       // Inicializar o mapa com as coordenadas de Caconde
@@ -61,6 +65,12 @@ const MapManager = {
         if (window.homeMap) {
           window.homeMap.invalidateSize();
           console.log("[MapManager] Mapa da home inicializado com sucesso!");
+          
+          // Disparar evento novamente após um pequeno atraso para garantir que os marcadores sejam adicionados
+          setTimeout(() => {
+            const mapInitializedEvent = new CustomEvent('homeMapInitialized');
+            document.dispatchEvent(mapInitializedEvent);
+          }, 100);
         }
       }, 300);
     } catch (error) {
