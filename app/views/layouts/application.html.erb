@@ -41,7 +41,7 @@
       <% end %>
 
       <%= yield %>
-      <%= render "complaints/map_fix" if controller_name == "complaints" && (action_name == "new" || action_name == "create" || action_name == "edit" || action_name == "update") %>
+      <%= render "complaints/map" if controller_name == "complaints" && (action_name == "new" || action_name == "create" || action_name == "edit" || action_name == "update") %>
     </div>
 
     <!-- 8. Rodapé -->
