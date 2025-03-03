@@ -4,38 +4,36 @@
   </div>
   <div class='col-md-4 text-end'>
     <% if user_signed_in? %>
-      <%= link_to 'Nova Reclamação', new_complaint_path, class: 'btn btn-primary' %>
+      <%= link_to 'Nova Reclamação', new_complaint_path, class: 'btn btn-primary black-orange' %>
     <% end %>
   </div>
 </div>
 
 <div class='row mb-4'>
   <div class='col-md-12'>
-    <%= form_with url: complaints_path, method: :get, class: 'row g-3', local: true do |f| %>
-      <div class='col-md-3'>
+    <%= form_with url: complaints_path, method: :get, class: 'grid-filter', local: true do |f| %>
+      <div class='w-100'>
         <%= f.select :category, 
                     options_for_select(Complaint.categories.map { |k, v| [v, k] }, params[:category]),
                     { include_blank: 'Todas as Categorias' },
                     class: 'form-select' %>
       </div>
-      <div class='col-md-3'>
+      <div class='w-100'>
         <%= f.select :status, 
                     options_for_select(Complaint.statuses.map { |k, v| [v, k] }, params[:status]),
                     { include_blank: 'Todos os Status' },
                     class: 'form-select' %>
       </div>
-      <div class='col-md-2'>
+      <div class='w-100'>
         <%= f.select :anonymous,
                     options_for_select([['Anônimas', 'true'], ['Não anônimas', 'false']], params[:anonymous]),
                     { include_blank: 'Todas (anônimas ou não)' },
                     class: 'form-select' %>
       </div>
-      <div class='col-md-3'>
-        <%= f.text_field :address, placeholder: 'Endereço', class: 'form-control' %>
+      <div class='w-100'>
+        <%= f.text_field :address, placeholder: 'Endereço', class: 'form-control w-100' %>
       </div>
-      <div class='col-md-2'>
-        <%= f.submit 'Filtrar', class: 'btn btn-outline-primary w-100' %>
-      </div>
+      <%= f.submit 'Filtrar', class: 'btn btn-outline-secondary' %>
     <% end %>
   </div>
 </div>

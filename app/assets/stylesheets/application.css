@@ -49,6 +49,7 @@
 body {
   font-family: 'Inter', sans-serif;
   color: var(--text-color);
+  height: 100vh;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -320,13 +321,16 @@ h1, h2, h3, h4, h5, h6 {
 /* Footer Section */
 .footer-section {
   padding: 4rem 0 2rem;
-  background-color: var(--dark-bg);
+  background-color: black;
   color: white;
+  width: 100%;
+  margin-top: 20px;
 }
 
 .footer-heading {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
+  color: orange;
 }
 
 .footer-link {
@@ -354,7 +358,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .social-icon:hover {
-  background-color: var(--primary-color);
+  background-color:  orange;
+  color: black;
 }
 
 .footer-bottom {
@@ -372,4 +377,135 @@ h1, h2, h3, h4, h5, h6 {
   .stat-number {
     font-size: 2.5rem;
   }
+}
+
+/* Customização da Navbar */
+.navbar-custom {
+  background-color: black; /* Cor de fundo da navbar */
+}
+
+.navbar-custom .nav-link {
+  text-decoration: none;
+  color: orange; /* Cor dos links */
+}
+
+.navbar-custom .nav-link:hover, .navbar-custom .nav-link:focus {
+  color: white; /* Cor dos links ao passar o mouse */
+}
+
+.h-8vh {
+  height: 8vh;
+}
+
+.nav-item {
+  height: inherit;
+  align-items: center;
+  border-bottom: none;
+  color: white;
+}
+
+a, a:link, a:visited {
+  color: orange;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a:hover, a:focus {
+  color: white;
+}
+
+.navbar-brand:focus, .navbar-brand:hover {
+  color: white !important;
+}
+
+.dropdown-item {
+  color: black !important;
+  width: -webkit-fill-available !important;
+}
+
+.input-group .btn {
+  background-image: unset !important;
+  background-color: orange !important;
+  color: black !important;
+  text-shadow: unset !important;
+  border: 1px solid orange !important;
+}
+
+.input-group .btn:hover {
+  text-shadow: unset !important;
+  background-image: unset !important;
+  background-color: rgb(224, 146, 1) !important;
+  color: black !important;
+}
+
+.black-orange {
+  background-color: orange !important;
+  color: black !important;
+  text-decoration: none;
+  font-weight: bold;
+  border: unset!important;
+}
+
+.black-orange:hover {
+  background-color: rgb(232, 151, 2) !important;
+}
+
+button[type="submit"] {
+  background: none !important;
+  color: inherit !important;
+  border: none !important;
+  text-decoration: none !important;
+  text-shadow: unset !important;
+  font-weight: bold;
+}
+
+button[type="submit"]:hover {
+  background: none !important;
+  color: inherit !important;
+  border: none !important;
+}
+
+form input[type=submit], form input[type=button], form button{
+  background: none !important;
+  color: inherit !important;
+  border: none !important;
+  text-decoration: none !important;
+  text-shadow: unset !important;
+  font-weight: bold;
+}
+
+.form-inputs {
+  display: grid;
+  gap: 8px;
+}
+
+input#complaint_title, input#address-input {
+  width: 100% !important;
+}
+
+.form-actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn-outline-secondary:hover {
+  background-color: rgb(232, 151, 2) !important;
+  color: black !important;
+}
+
+input.btn.btn-primary.black-orange {
+  background-color: orange !important;
+  color: black !important;
+  text-decoration: none;
+  font-weight: bold;
+  border: unset !important;
+}
+
+.grid-filter {
+  display: grid;
+  grid-template-columns: repeat(5, .5fr);
+  justify-items: center;
+  align-items: center;
+  gap: 8px;
 }
