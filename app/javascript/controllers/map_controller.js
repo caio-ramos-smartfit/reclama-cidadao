@@ -17,18 +17,25 @@ export default class extends Controller {
     // Observe que esta abordagem é diferente devido à forma de importação
     if (!this.mapInitialized) {
       this.fixLeafletIcons()
+
       this.initializeMap()
-      
+
+      if (this.complaintsValue && this.complaintsValue.length > 0 && !this.complaintsValue.every(item => item === null)) {
+        this.complaintsValueGlobal = this.complaintsValue;
+      } else {
+        this.complaintsValueGlobal = false; // Define como false se não houver valores válidos
+      }
+
       // Adiciona marcadores se houver reclamações
-      if (this.hasComplaintsValue && this.complaintsValue.length > 0) {
+      if (this.complaintsValueGlobal) {
         this.addComplaintMarkers()
       }
-      
+
       // Adiciona funcionalidade de seleção de ponto se o mapa for editável
       if (this.editableValue) {
         this.enableMapSelection()
       }
-      
+
       this.mapInitialized = true
     }
   }
@@ -60,7 +67,7 @@ export default class extends Controller {
       [this.latitudeValue, this.longitudeValue], 
       this.zoomValue
     )
-    
+
     // Adiciona camada do OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
@@ -73,10 +80,10 @@ export default class extends Controller {
       // Só adiciona marcador se tiver coordenadas válidas
       if (complaint.latitude && complaint.longitude) {
         const marker = L.marker([complaint.latitude, complaint.longitude]).addTo(this.map)
-        
+
         // Define a cor baseada no status
         const statusColor = this.getStatusColor(complaint.status)
-        
+
         // Configura o popup
         marker.bindPopup(`
           <div class="popup-content">
@@ -93,18 +100,18 @@ export default class extends Controller {
   enableMapSelection() {
     // Variável para o marcador selecionado
     this.currentMarker = null
-    
+
     // Adiciona evento de clique no mapa
     this.map.on('click', this.handleMapClick.bind(this))
-    
+
     // Se já existir um formulário na página, verifica se já tem coordenadas
     const latField = document.getElementById('complaint_latitude')
     const lngField = document.getElementById('complaint_longitude')
-    
+
     if (latField && latField.value && lngField && lngField.value) {
       const lat = parseFloat(latField.value)
       const lng = parseFloat(lngField.value)
-      
+
       // Adiciona marcador nas coordenadas existentes
       this.setMarkerAt(lat, lng)
       this.map.setView([lat, lng], 15)
@@ -112,29 +119,47 @@ export default class extends Controller {
   }
 
   handleMapClick(e) {
-    const lat = e.latlng.lat
-    const lng = e.latlng.lng
-    
-    // Atualiza os campos ocultos do formulário, se existirem
-    const latField = document.getElementById('complaint_latitude')
-    const lngField = document.getElementById('complaint_longitude')
-    
+    const lat = e.latlng.lat; // Latitude do clique
+    const lng = e.latlng.lng; // Longitude do clique
+
+    // Atualiza os campos ocultos do formulário
+    const latField = document.getElementById('complaint_latitude');
+    const lngField = document.getElementById('complaint_longitude');
+    const addressField = document.getElementById('address-input'); // Campo de endereço
+
     if (latField && lngField) {
-      latField.value = lat
-      lngField.value = lng
+        latField.value = lat;
+        lngField.value = lng;
     }
-    
+
     // Adiciona/atualiza o marcador
-    this.setMarkerAt(lat, lng)
-    
-    // Emite evento personalizado que pode ser capturado por outros controladores
-    const event = new CustomEvent('map:location-selected', { 
-      detail: { latitude: lat, longitude: lng }
-    })
-    window.dispatchEvent(event)
-    
-    // Opcional: Fazer geocodificação reversa para obter o endereço
-    this.reverseGeocode(lat, lng)
+    this.setMarkerAt(lat, lng);
+
+    // Chama a geocodificação reversa para obter o endereço
+    this.reverseGeocode(lat, lng, addressField); // Verifique se esta linha está presente
+}
+  reverseGeocode(lat, lng, addressField) {
+    // Tenta obter o endereço a partir das coordenadas
+    if (!addressField) return;
+
+    // console.log(`Buscando endereço para: ${lat}, ${lng}`); // Debug: coordenadas
+
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // console.log(data); // Debug: resposta da API
+        if (data && data.display_name) {
+          addressField.value = data.display_name; // Atualiza o campo de endereço
+        } else {
+          console.error('Endereço não encontrado'); // Debug: endereço não encontrado
+        }
+      })
+      .catch(error => console.error('Erro na geocodificação reversa:', error));
   }
 
   setMarkerAt(lat, lng) {
@@ -142,25 +167,10 @@ export default class extends Controller {
     if (this.currentMarker) {
       this.map.removeLayer(this.currentMarker)
     }
-    
+
     // Adiciona novo marcador
     this.currentMarker = L.marker([lat, lng]).addTo(this.map)
     this.currentMarker.bindPopup('Localização selecionada').openPopup()
-  }
-
-  reverseGeocode(lat, lng) {
-    // Tenta obter o endereço a partir das coordenadas
-    const addressField = document.getElementById('complaint_address')
-    if (!addressField) return
-    
-    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
-      .then(response => response.json())
-      .then(data => {
-        if (data && data.display_name) {
-          addressField.value = data.display_name
-        }
-      })
-      .catch(error => console.error('Erro na geocodificação reversa:', error))
   }
 
   getStatusColor(status) {

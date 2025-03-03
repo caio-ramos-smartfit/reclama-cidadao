@@ -22,6 +22,7 @@ class ComplaintsController < ApplicationController
 
   def new
     @complaint = Complaint.new
+    @complaints = [@complaints] unless @complaints.is_a?(Array)
   end
 
   def create
