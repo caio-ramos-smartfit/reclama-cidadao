@@ -1,18 +1,3 @@
 import "@hotwired/turbo-rails"
 import "controllers"
-
-document.addEventListener('turbo:before-frame-render', () => {
-    console.log("load aqui")
-    const dropdownToggle = document.getElementById('navbarDropdown');
-    if (dropdownToggle) {
-        dropdownToggle.addEventListener('click', (event) => {
-            event.preventDefault(); // Previne o comportamento padrão
-            // Aqui você pode adicionar a lógica para atualizar o conteúdo do dropdown, se necessário
-            // Exemplo: re-inicializar o dropdown do Bootstrap
-            if (typeof bootstrap !== 'undefined') {
-                const dropdown = new bootstrap.Dropdown(dropdownToggle);
-                dropdown.toggle(); // Alterna o estado do dropdown
-            }
-        });
-    }
-});
+import "bootstrap"
