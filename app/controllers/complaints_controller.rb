@@ -13,12 +13,16 @@ class ComplaintsController < ApplicationController
   end
 
   def show
+    @complaints = Complaint.find(params[:id])
+    @complaints = [@complaints] unless @complaints.is_a?(Array)
+
     @comment = Comment.new
     @comments = @complaint.comments.includes(:user).page(params[:page]).per(5)
   end
 
   def new
     @complaint = Complaint.new
+    @complaints = [@complaints] unless @complaints.is_a?(Array)
   end
 
   def create

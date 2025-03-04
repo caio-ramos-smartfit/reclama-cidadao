@@ -40,7 +40,9 @@
     
     <div class="row">
       <div class="col-12">
-        <%= render 'home/home_map' %>
+        <%= render partial: 'complaints/map', locals: { 
+          editable: false 
+        } %>
       </div>
     </div>
   </div>
